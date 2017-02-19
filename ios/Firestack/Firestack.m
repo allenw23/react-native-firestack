@@ -141,6 +141,9 @@ RCT_EXPORT_METHOD(configureWithOptions:(NSDictionary *) opts
                                      @"MESSAGING_SENDER_ID": @[
                                              @"messagingSenderId",
                                              @"messagingSenderID"
+                                             ],
+                                     @"ENABLE_PERSISTENCE": @[
+                                             @"enablePersistence"
                                              ]
                                      };
         NSArray *optionKeys = [keyMapping allKeys];
@@ -205,6 +208,7 @@ RCT_EXPORT_METHOD(configureWithOptions:(NSDictionary *) opts
                 NSLog(@"DATABASE_URL: %@", [props valueForKey:@"DATABASE_URL"]);
                 NSLog(@"STORAGE_BUCKET: %@", [props valueForKey:@"STORAGE_BUCKET"]);
                 NSLog(@"DEEP_LINK_SCHEME: %@", [props valueForKey:@"DEEP_LINK_SCHEME"]);
+                NSLog(@"ENABLE_PERSISTENCE: %@", [props valueForKey:@"ENABLE_PERSISTENCE"]);
             }
 
             FIROptions *finalOptions = [[FIROptions alloc]
@@ -227,6 +231,11 @@ RCT_EXPORT_METHOD(configureWithOptions:(NSDictionary *) opts
 
             if ([FIRApp defaultApp] == NULL) {
                 [FIRApp configureWithOptions:finalOptions];
+                
+                BOOL enablePersistence = [[props valueForKey: @"ENABLE_PERSISTENCE"] boolValue];
+                if (enablePersistence == true && [FIRDatabase database].persistenceEnabled == false) {
+                    [FIRDatabase database].persistenceEnabled = true;
+                }
             }
             [Firestack initializeFirestack:self];
             callback(@[[NSNull null], props]);
